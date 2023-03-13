@@ -21,3 +21,7 @@ func (p *PolyLineM) GetShapeType() int32 {
 func (p *PolyLineM) String() string {
 	return "PolyLineM"
 }
+
+func (p *PolyLineM) Copy() Shape {
+	return new(PolyLineM)
+}

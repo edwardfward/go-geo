@@ -21,3 +21,7 @@ func (m *MultiPoint) String() string {
 func NewMultiPoint(b []byte) (*MultiPoint, error) {
 	return &MultiPoint{}, nil
 }
+
+func (m *MultiPoint) Copy() Shape {
+	return new(MultiPoint)
+}

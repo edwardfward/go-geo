@@ -27,3 +27,7 @@ func (p *Polygon) NumberPoints() int32 {
 func (p *Polygon) String() string {
 	return "Polygon"
 }
+
+func (p *Polygon) Copy() Shape {
+	return new(Polygon)
+}

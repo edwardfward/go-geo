@@ -19,3 +19,7 @@ func (m *MultiPointM) GetShapeType() int32 {
 func (m *MultiPointM) String() string {
 	return "MultiPointM"
 }
+
+func (m *MultiPointM) Copy() Shape {
+	return new(MultiPointM)
+}

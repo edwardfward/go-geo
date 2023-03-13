@@ -17,6 +17,10 @@ func (p *Point) String() string {
 	return "Point"
 }
 
+func (p *Point) Copy() Shape {
+	return new(Point)
+}
+
 func NewPoint(x float64, y float64) Point {
 	return Point{x, y}
 }

@@ -21,3 +21,7 @@ func (p *PolygonM) GetShapeType() int32 {
 func (p *PolygonM) String() string {
 	return "PolygonM"
 }
+
+func (p *PolygonM) Copy() Shape {
+	return new(PolygonM)
+}

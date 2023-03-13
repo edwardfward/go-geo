@@ -17,3 +17,7 @@ func (p *PolygonZ) GetShapeType() int32 {
 func (p *PolygonZ) String() string {
 	return "PolygonZ"
 }
+
+func (p *PolygonZ) Copy() Shape {
+	return new(PolygonZ)
+}

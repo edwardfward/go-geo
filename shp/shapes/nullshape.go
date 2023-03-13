@@ -14,3 +14,7 @@ func (n *NullShape) GetShapeType() int32 {
 func (n *NullShape) String() string {
 	return "NullShape"
 }
+
+func (n *NullShape) Copy() Shape {
+	return new(NullShape)
+}

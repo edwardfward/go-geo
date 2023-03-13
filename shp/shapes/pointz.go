@@ -18,3 +18,7 @@ func (p *PointZ) GetShapeType() int32 {
 func (p *PointZ) String() string {
 	return "PointZ"
 }
+
+func (p *PointZ) Copy() Shape {
+	return new(PointZ)
+}

@@ -22,6 +22,10 @@ func (h *ShapeFileHeader) ShapeType() string {
 	return h.shapeType.String()
 }
 
+func (h *ShapeFileHeader) NewShape() shapes.Shape {
+	return h.shapeType.Copy() // [todo] change to New() for Shape interface
+}
+
 func (h *ShapeFileHeader) BoundingBox() (shapes.Point, shapes.Point) {
 	return h.box[0], h.box[1]
 }

@@ -19,3 +19,7 @@ func (p *PolyLine) GetShapeType() int32 {
 func (p *PolyLine) String() string {
 	return "PolyLine"
 }
+
+func (p *PolyLine) Copy() Shape {
+	return new(PolyLine)
+}

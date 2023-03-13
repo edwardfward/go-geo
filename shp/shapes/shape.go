@@ -8,6 +8,7 @@ type Shape interface {
 	ParseShape([]byte)
 	GetShapeType() int32
 	String() string
+	Copy() Shape
 }
 
 func GetShapeType(value int32) (Shape, error) {

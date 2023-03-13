@@ -17,3 +17,7 @@ func (m *MultiPointZ) GetShapeType() int32 {
 func (m *MultiPointZ) String() string {
 	return "MultiPointZ"
 }
+
+func (m *MultiPointZ) Copy() Shape {
+	return new(MultiPointZ)
+}
