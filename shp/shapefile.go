@@ -3,15 +3,24 @@ package shp
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"go-shp/shp/header"
 	"go-shp/shp/records"
 	"log"
 	"os"
+	"time"
 )
 
 type ShapeFile struct {
-	header  header.ShapeFileHeader
-	records records.Records
+	header      header.ShapeFileHeader
+	records     records.Records
+	sizeBytes   int64
+	timeToParse time.Duration
+}
+
+func (s *ShapeFile) String() string {
+	return fmt.Sprintf("Shapefile contains %d shapes",
+		s.records.NumberOfShapes())
 }
 
 func ParseShapeFile(filePath string) *ShapeFile {
@@ -58,7 +67,7 @@ func (s *ShapeFile) ParseRecords(f *os.File) {
 		err = binary.Read(bytes.NewReader(b[0:4]), binary.BigEndian, &recordNumber)
 		err = binary.Read(bytes.NewReader(b[4:8]), binary.BigEndian, &recordContentLength)
 
-		// read and parse record
+		// read record
 		b = make([]byte, recordContentLength*2)
 		_, err = f.Read(b) // read record
 		if err != nil {
@@ -66,9 +75,15 @@ func (s *ShapeFile) ParseRecords(f *os.File) {
 				recordNumber, err)
 		}
 
+		// parse record
+		shape := s.header.NewShape()
+		shape.ParseShape(b)
+
+		// create record
+		r := records.NewRecord(recordNumber, shape, offset, recordContentLength)
+
 		// todo need to parse byte slice
-		s.records.Append(records.NewRecord(recordNumber,
-			s.header.NewShape(), int64(offset), recordContentLength))
+		s.records.Append(r)
 
 		offset += int64(8 + recordContentLength*2)
 	}

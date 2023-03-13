@@ -1,7 +1,10 @@
 package shapes
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
+	"log"
 )
 
 type Shape interface {
@@ -11,6 +14,12 @@ type Shape interface {
 	Copy() Shape
 }
 
+func ReadBinary[T int32 | float64](b []byte, order binary.ByteOrder, target *T) {
+	err := binary.Read(bytes.NewReader(b), order, target)
+	if err != nil {
+		log.Fatalf("error reading binary on %v: %v", target, err)
+	}
+}
 func GetShapeType(value int32) (Shape, error) {
 	switch value {
 	case 0:
