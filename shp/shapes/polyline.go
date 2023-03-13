@@ -1,6 +1,9 @@
 package shapes
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"go-shp/utils"
+)
 
 type PolyLine struct {
 	box          [2]Point // bounding box XMin, YMin, XMax, YMax
@@ -22,13 +25,13 @@ func (p *PolyLine) ParseShape(r []byte) {
 	var shapeType, numberParts, numberPoints int32
 	var xMin, yMin, xMax, yMax float64
 
-	ReadBinary(shapeTypeSlice, binary.LittleEndian, &shapeType)
-	ReadBinary(xMinSlice, binary.LittleEndian, &xMin)
-	ReadBinary(yMinSlice, binary.LittleEndian, &yMin)
-	ReadBinary(xMaxSlice, binary.LittleEndian, &xMax)
-	ReadBinary(yMaxSlice, binary.LittleEndian, &yMax)
-	ReadBinary(numberPartsSlice, binary.LittleEndian, &numberParts)
-	ReadBinary(numberPointsSlice, binary.LittleEndian, &numberPoints)
+	utils.ReadBinary(shapeTypeSlice, binary.LittleEndian, &shapeType)
+	utils.ReadBinary(xMinSlice, binary.LittleEndian, &xMin)
+	utils.ReadBinary(yMinSlice, binary.LittleEndian, &yMin)
+	utils.ReadBinary(xMaxSlice, binary.LittleEndian, &xMax)
+	utils.ReadBinary(yMaxSlice, binary.LittleEndian, &yMax)
+	utils.ReadBinary(numberPartsSlice, binary.LittleEndian, &numberParts)
+	utils.ReadBinary(numberPointsSlice, binary.LittleEndian, &numberPoints)
 
 	// build bounding box
 	p.box[0] = NewPoint(xMin, yMin)
@@ -41,7 +44,7 @@ func (p *PolyLine) ParseShape(r []byte) {
 	for x := int32(0); x < p.numberParts; x++ {
 		var part int32
 		partSlice := r[index : index+4]
-		ReadBinary(partSlice, binary.LittleEndian, &part)
+		utils.ReadBinary(partSlice, binary.LittleEndian, &part)
 		p.parts = append(p.parts, part)
 		index += 4
 	}
@@ -51,8 +54,8 @@ func (p *PolyLine) ParseShape(r []byte) {
 		pointXSlice := r[index : index+8]
 		pointYSlice := r[index+8 : index+16]
 		var pointX, pointY float64
-		ReadBinary(pointXSlice, binary.LittleEndian, &pointX)
-		ReadBinary(pointYSlice, binary.LittleEndian, &pointY)
+		utils.ReadBinary(pointXSlice, binary.LittleEndian, &pointX)
+		utils.ReadBinary(pointYSlice, binary.LittleEndian, &pointY)
 		p.points = append(p.points, NewPoint(pointX, pointY))
 		index += 16
 	}

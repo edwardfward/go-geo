@@ -5,8 +5,8 @@ type Point struct {
 	Y float64 // y coordinate
 }
 
-func (p *Point) ParseShape(b []byte) {
-
+func (p *Point) ParseShape(r []byte) {
+	
 }
 
 func (p *Point) GetShapeType() int32 {

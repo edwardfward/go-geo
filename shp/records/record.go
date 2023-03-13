@@ -1,34 +1,25 @@
 package records
 
 import (
-	"fmt"
+	"encoding/binary"
 	"go-shp/shp/shapes"
+	"go-shp/utils"
 )
 
 type Record struct {
-	id     int32
-	shape  shapes.Shape
-	offset int64
-	length int32
+	recordNumber  int32
+	contentLength int32
+	shape         shapes.Shape
+	offset        int64
 }
 
-type Records struct {
-	records []Record
-	shape   shapes.Shape
-}
+func ReadRecordHeader(r []byte) (recordNumber int32, contentLength int32) {
+	recordNumberSlice := r[0:4]  // bytes 0-3 of record header
+	contentLengthSlice := r[4:8] // bytes 3-7 of record header
 
-func (r *Records) Append(new Record) {
-	r.records = append(r.records, new)
-}
+	var number, length int32
+	utils.ReadBinary(recordNumberSlice, binary.BigEndian, &number)
+	utils.ReadBinary(contentLengthSlice, binary.BigEndian, &length)
 
-func (r *Records) NumberOfShapes() int32 {
-	return int32(len(r.records))
-}
-
-func (r *Records) String() string {
-	return fmt.Sprintf("Number of Shapes: %d", r.NumberOfShapes())
-}
-
-func NewRecord(id int32, shape shapes.Shape, offset int64, length int32) Record {
-	return Record{id: id, shape: shape, offset: offset, length: length}
+	return number, length
 }
