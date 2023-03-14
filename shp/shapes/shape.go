@@ -4,6 +4,7 @@ import (
 	"errors"
 )
 
+// todo documentation
 type Shape interface {
 	ParseShape([]byte)
 	GetShapeType() int32
@@ -11,6 +12,7 @@ type Shape interface {
 	Copy() Shape
 }
 
+// todo documentation
 func GetShapeType(value int32) (Shape, error) {
 	switch value {
 	case 0:

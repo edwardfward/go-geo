@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// todo documentation
 type ShapeFile struct {
 	header      header.ShapeFileHeader
 	records     records.Records
@@ -16,11 +17,13 @@ type ShapeFile struct {
 	timeToParse time.Duration
 }
 
+// todo documentation
 func (s *ShapeFile) String() string {
 	return fmt.Sprintf("Shapefile contains %d shapes",
 		s.records.NumberOfShapes())
 }
 
+// todo documentation
 func ParseShapeFile(filePath string) *ShapeFile {
 	// [todo] check for *.shp extension
 	// open shapefile
@@ -42,6 +45,7 @@ func ParseShapeFile(filePath string) *ShapeFile {
 	return shapeFile
 }
 
+// todo documentation
 func (s *ShapeFile) ShapeType() string {
 	return s.header.ShapeType()
 }

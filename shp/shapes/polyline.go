@@ -5,6 +5,7 @@ import (
 	"go-shp/utils"
 )
 
+// todo documentation
 type PolyLine struct {
 	box          [2]Point // bounding box XMin, YMin, XMax, YMax
 	numberParts  int32    // number of distinct line segments
@@ -13,6 +14,7 @@ type PolyLine struct {
 	points       []Point  // no delimiter between parts
 }
 
+// todo documentation
 func (p *PolyLine) ParseShape(r []byte) {
 	shapeTypeSlice := r[0:4]
 	xMinSlice := r[4:12]
@@ -61,14 +63,17 @@ func (p *PolyLine) ParseShape(r []byte) {
 	}
 }
 
+// todo documentation
 func (p *PolyLine) GetShapeType() int32 {
 	return 3
 }
 
+// todo documentation
 func (p *PolyLine) String() string {
 	return "PolyLine"
 }
 
+// todo documentation
 func (p *PolyLine) Copy() Shape {
 	return new(PolyLine)
 }
