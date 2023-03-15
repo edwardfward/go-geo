@@ -21,3 +21,7 @@ func (p *PointM) String() string {
 func (p *PointM) New() Shape {
 	return new(PointM)
 }
+
+func NewPointM(p []byte) PointM {
+	return PointM{}
+}

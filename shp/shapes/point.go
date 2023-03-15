@@ -2,6 +2,7 @@ package shapes
 
 import (
 	"encoding/binary"
+	"fmt"
 	"go-shp/utils"
 	"log"
 )
@@ -28,7 +29,7 @@ func (p *Point) Type() int32 {
 }
 
 func (p *Point) String() string {
-	return "Point"
+	return fmt.Sprintf("Point:{%f, %f", p.X, p.Y)
 }
 
 // New todo add documentation
