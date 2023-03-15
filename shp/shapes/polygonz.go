@@ -6,11 +6,11 @@ type PolygonZ struct {
 	points []PointZ
 }
 
-func (p *PolygonZ) ParseShape(b []byte) {
+func (p *PolygonZ) Parse(b []byte) {
 
 }
 
-func (p *PolygonZ) GetShapeType() int32 {
+func (p *PolygonZ) Type() int32 {
 	return 15
 }
 
@@ -18,6 +18,6 @@ func (p *PolygonZ) String() string {
 	return "PolygonZ"
 }
 
-func (p *PolygonZ) Copy() Shape {
+func (p *PolygonZ) New() Shape {
 	return new(PolygonZ)
 }

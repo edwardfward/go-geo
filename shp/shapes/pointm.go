@@ -6,11 +6,11 @@ type PointM struct {
 	M float64 // measure
 }
 
-func (p *PointM) ParseShape(b []byte) {
+func (p *PointM) Parse(b []byte) {
 
 }
 
-func (p *PointM) GetShapeType() int32 {
+func (p *PointM) Type() int32 {
 	return 21
 }
 
@@ -18,6 +18,6 @@ func (p *PointM) String() string {
 	return "PointM"
 }
 
-func (p *PointM) Copy() Shape {
+func (p *PointM) New() Shape {
 	return new(PointM)
 }

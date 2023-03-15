@@ -6,11 +6,11 @@ type MultiPointZ struct {
 	points       []PointZ
 }
 
-func (m *MultiPointZ) ParseShape(b []byte) {
+func (m *MultiPointZ) Parse(b []byte) {
 
 }
 
-func (m *MultiPointZ) GetShapeType() int32 {
+func (m *MultiPointZ) Type() int32 {
 	return 18
 }
 
@@ -18,6 +18,6 @@ func (m *MultiPointZ) String() string {
 	return "MultiPointZ"
 }
 
-func (m *MultiPointZ) Copy() Shape {
+func (m *MultiPointZ) New() Shape {
 	return new(MultiPointZ)
 }

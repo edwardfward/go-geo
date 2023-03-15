@@ -1,15 +1,29 @@
 package shapes
 
+import (
+	"encoding/binary"
+	"go-shp/utils"
+	"log"
+)
+
 type Point struct {
 	X float64 // x coordinate
 	Y float64 // y coordinate
 }
 
-func (p *Point) ParseShape(r []byte) {
-	
+// Parse todo complete documentation
+func (p *Point) Parse(r []byte) {
+	x_ := r[4:12]  // x coordinate float64
+	y_ := r[12:20] // y coordinate float64
+	var x, y float64
+	utils.ReadBinary(x_, binary.LittleEndian, &x)
+	utils.ReadBinary(y_, binary.LittleEndian, &y)
+	p.X = x
+	p.Y = y
 }
 
-func (p *Point) GetShapeType() int32 {
+// Type todo add documentation
+func (p *Point) Type() int32 {
 	return 1
 }
 
@@ -17,10 +31,25 @@ func (p *Point) String() string {
 	return "Point"
 }
 
-func (p *Point) Copy() Shape {
+// New todo add documentation
+func (p *Point) New() Shape {
 	return new(Point)
 }
 
+// NewPoint todo add documentation
 func NewPoint(x float64, y float64) Point {
 	return Point{x, y}
+}
+
+func ParseNewPoint(p []byte) Point {
+	if len(p) != 16 { // x,y float 64
+		log.Fatalf("point.go : incorrect byte length to parse point")
+	}
+	_x := p[0:8]
+	_y := p[8:16]
+	var x, y float64
+	utils.ReadBinary(_x, binary.LittleEndian, &x)
+	utils.ReadBinary(_y, binary.LittleEndian, &y)
+
+	return NewPoint(x, y)
 }

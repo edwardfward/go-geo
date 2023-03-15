@@ -3,11 +3,11 @@ package shapes
 type NullShape struct {
 }
 
-func (n *NullShape) ParseShape([]byte) {
+func (n *NullShape) Parse([]byte) {
 
 }
 
-func (n *NullShape) GetShapeType() int32 {
+func (n *NullShape) Type() int32 {
 	return 0
 }
 
@@ -15,6 +15,6 @@ func (n *NullShape) String() string {
 	return "NullShape"
 }
 
-func (n *NullShape) Copy() Shape {
+func (n *NullShape) New() Shape {
 	return new(NullShape)
 }

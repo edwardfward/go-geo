@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// todo documentation
+// ShapeFile todo documentation
 type ShapeFile struct {
 	header      header.ShapeFileHeader
 	records     records.Records
@@ -23,7 +23,7 @@ func (s *ShapeFile) String() string {
 		s.records.NumberOfShapes())
 }
 
-// todo documentation
+// ParseShapeFile todo documentation
 func ParseShapeFile(filePath string) *ShapeFile {
 	// [todo] check for *.shp extension
 	// open shapefile
@@ -39,13 +39,13 @@ func ParseShapeFile(filePath string) *ShapeFile {
 		log.Fatalf("unable to open shapefile %s: %v", filePath, err)
 	}
 	shapeFile := &ShapeFile{}
-	shapeFile.header, err = header.ParseHeader(f)
+	shapeFile.header, err = header.Parse(f)
 	shapeFile.records = records.ParseRecords(f)
 
 	return shapeFile
 }
 
-// todo documentation
+// ShapeType todo documentation
 func (s *ShapeFile) ShapeType() string {
 	return s.header.ShapeType()
 }

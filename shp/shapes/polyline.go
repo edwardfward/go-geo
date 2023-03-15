@@ -5,7 +5,7 @@ import (
 	"go-shp/utils"
 )
 
-// todo documentation
+// PolyLine todo documentation
 type PolyLine struct {
 	box          [2]Point // bounding box XMin, YMin, XMax, YMax
 	numberParts  int32    // number of distinct line segments
@@ -14,32 +14,23 @@ type PolyLine struct {
 	points       []Point  // no delimiter between parts
 }
 
-// todo documentation
-func (p *PolyLine) ParseShape(r []byte) {
-	shapeTypeSlice := r[0:4]
-	xMinSlice := r[4:12]
-	yMinSlice := r[12:20]
-	xMaxSlice := r[20:28]
-	yMaxSlice := r[28:36]
-	numberPartsSlice := r[36:40]
-	numberPointsSlice := r[40:44]
+// Parse todo documentation
+func (p *PolyLine) Parse(r []byte) {
+	_shape := r[0:4] // todo not used or needed
+	_box := r[4:36]
+	_parts := r[36:40]
+	_points := r[40:44]
 
-	var shapeType, numberParts, numberPoints int32
-	var xMin, yMin, xMax, yMax float64
+	var shapeType, parts, points int32
 
-	utils.ReadBinary(shapeTypeSlice, binary.LittleEndian, &shapeType)
-	utils.ReadBinary(xMinSlice, binary.LittleEndian, &xMin)
-	utils.ReadBinary(yMinSlice, binary.LittleEndian, &yMin)
-	utils.ReadBinary(xMaxSlice, binary.LittleEndian, &xMax)
-	utils.ReadBinary(yMaxSlice, binary.LittleEndian, &yMax)
-	utils.ReadBinary(numberPartsSlice, binary.LittleEndian, &numberParts)
-	utils.ReadBinary(numberPointsSlice, binary.LittleEndian, &numberPoints)
+	utils.ReadBinary(_shape, binary.LittleEndian, &shapeType)
+	utils.ReadBinary(_parts, binary.LittleEndian, &parts)
+	utils.ReadBinary(_points, binary.LittleEndian, &points)
 
 	// build bounding box
-	p.box[0] = NewPoint(xMin, yMin)
-	p.box[1] = NewPoint(xMax, yMax)
-	p.numberParts = numberParts
-	p.numberPoints = numberPoints
+	p.box = NewBoundaryBox(_box)
+	p.numberParts = parts
+	p.numberPoints = points
 
 	// build parts array
 	index := int32(44)
@@ -63,8 +54,8 @@ func (p *PolyLine) ParseShape(r []byte) {
 	}
 }
 
-// todo documentation
-func (p *PolyLine) GetShapeType() int32 {
+// Type todo documentation
+func (p *PolyLine) Type() int32 {
 	return 3
 }
 
@@ -73,7 +64,7 @@ func (p *PolyLine) String() string {
 	return "PolyLine"
 }
 
-// todo documentation
-func (p *PolyLine) Copy() Shape {
+// New todo documentation
+func (p *PolyLine) New() Shape {
 	return new(PolyLine)
 }

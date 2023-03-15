@@ -1,5 +1,6 @@
 package shapes
 
+// MultiPointM todo documentation
 type MultiPointM struct {
 	box          [2]Point
 	numberPoints int32
@@ -8,11 +9,13 @@ type MultiPointM struct {
 	measureRange [2]float64
 }
 
-func (m *MultiPointM) ParseShape(b []byte) {
+// Parse todo documentation
+func (m *MultiPointM) Parse(r []byte) {
 
 }
 
-func (m *MultiPointM) GetShapeType() int32 {
+// Type todo documentation
+func (m *MultiPointM) Type() int32 {
 	return 28
 }
 
@@ -20,6 +23,7 @@ func (m *MultiPointM) String() string {
 	return "MultiPointM"
 }
 
-func (m *MultiPointM) Copy() Shape {
+// New todo documentation
+func (m *MultiPointM) New() Shape {
 	return new(MultiPointM)
 }

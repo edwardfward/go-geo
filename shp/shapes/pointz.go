@@ -7,11 +7,11 @@ type PointZ struct {
 	m float64 // m measure (e.g. temperature, pressure)
 }
 
-func (p *PointZ) ParseShape(b []byte) {
+func (p *PointZ) Parse(b []byte) {
 
 }
 
-func (p *PointZ) GetShapeType() int32 {
+func (p *PointZ) Type() int32 {
 	return 11
 }
 
@@ -19,6 +19,6 @@ func (p *PointZ) String() string {
 	return "PointZ"
 }
 
-func (p *PointZ) Copy() Shape {
+func (p *PointZ) New() Shape {
 	return new(PointZ)
 }

@@ -10,11 +10,11 @@ type PolygonM struct {
 	measureRange [2]float64
 }
 
-func (p *PolygonM) ParseShape(b []byte) {
+func (p *PolygonM) Parse(b []byte) {
 
 }
 
-func (p *PolygonM) GetShapeType() int32 {
+func (p *PolygonM) Type() int32 {
 	return 25
 }
 
@@ -22,6 +22,6 @@ func (p *PolygonM) String() string {
 	return "PolygonM"
 }
 
-func (p *PolygonM) Copy() Shape {
+func (p *PolygonM) New() Shape {
 	return new(PolygonM)
 }

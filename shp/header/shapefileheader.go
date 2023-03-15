@@ -12,25 +12,25 @@ type ShapeFileHeader struct {
 	fileCode   int32           // 9994
 	fileLength int32           // total length of the file in bytes
 	version    int32           // 1000
-	shapeType  shapes.Shape    // only one shape type per shapefile
+	shape      shapes.Shape    // only one shape type per shapefile
 	box        [2]shapes.Point // boundary box (min, max)
 	zRange     [2]float64      // [min, max] z
 	mRange     [2]float64      // [min, max] measure
 }
 
 func (h *ShapeFileHeader) ShapeType() string {
-	return h.shapeType.String()
+	return h.shape.String()
 }
 
 func (h *ShapeFileHeader) NewShape() shapes.Shape {
-	return h.shapeType.Copy() // [todo] change to New() for Shape interface
+	return h.shape.New() // [todo] change to New() for Shape interface
 }
 
 func (h *ShapeFileHeader) BoundingBox() (shapes.Point, shapes.Point) {
 	return h.box[0], h.box[1]
 }
 
-func ParseHeader(f *os.File) (ShapeFileHeader, error) {
+func Parse(f *os.File) (ShapeFileHeader, error) {
 	// shapefile headers are 100 bytes
 	headerBytes := make([]byte, 100)
 	_, err := f.Read(headerBytes)
@@ -72,7 +72,7 @@ func ParseHeader(f *os.File) (ShapeFileHeader, error) {
 	err = binary.Read(bytes.NewReader(mMinSlice), binary.LittleEndian, &mMin)
 	err = binary.Read(bytes.NewReader(mMaxSlice), binary.LittleEndian, &mMax)
 
-	shapeFileHeader.shapeType, err = shapes.GetShapeType(shapeTypeInt)
+	shapeFileHeader.shape, err = shapes.GetShapeType(shapeTypeInt)
 	if err != nil {
 		log.Fatalf("unrecognized shape type %d: %v", shapeTypeInt, err)
 	}

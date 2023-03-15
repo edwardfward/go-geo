@@ -11,13 +11,13 @@ type PolyLineM struct {
 	measureRange [2]float64
 }
 
-// todo documentation
-func (p *PolyLineM) ParseShape(b []byte) {
+// Parse todo documentation
+func (p *PolyLineM) Parse(b []byte) {
 
 }
 
-// todo documentation
-func (p *PolyLineM) GetShapeType() int32 {
+// Type todo documentation
+func (p *PolyLineM) Type() int32 {
 	return 23
 }
 
@@ -26,7 +26,7 @@ func (p *PolyLineM) String() string {
 	return "PolyLineM"
 }
 
-// todo documentation
-func (p *PolyLineM) Copy() Shape {
+// New todo documentation
+func (p *PolyLineM) New() Shape {
 	return new(PolyLineM)
 }

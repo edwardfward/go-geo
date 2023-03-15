@@ -1,18 +1,40 @@
 package shapes
 
 import (
+	"encoding/binary"
 	"errors"
+	"go-shp/utils"
+	"log"
 )
 
-// todo documentation
+// Shape todo documentation
 type Shape interface {
-	ParseShape([]byte)
-	GetShapeType() int32
+	Parse([]byte)
+	Type() int32
 	String() string
-	Copy() Shape
+	New() Shape
 }
 
-// todo documentation
+// BoundaryBox todo documentation
+func NewBoundaryBox(box []byte) [2]Point {
+	if len(box) != 32 {
+		log.Fatalf("shape.go: error parsing boundary box incorrect bytes")
+	}
+	_xMin := box[0:8]
+	_yMin := box[8:16]
+	_xMax := box[16:24]
+	_yMax := box[24:32]
+
+	var xMin, yMin, xMax, yMax float64
+	utils.ReadBinary(_xMin, binary.LittleEndian, &xMin)
+	utils.ReadBinary(_yMin, binary.LittleEndian, &yMin)
+	utils.ReadBinary(_xMax, binary.LittleEndian, &xMax)
+	utils.ReadBinary(_yMax, binary.LittleEndian, &yMax)
+
+	return [2]Point{NewPoint(xMin, yMin), NewPoint(xMax, yMax)}
+}
+
+// GetShapeType todo documentation
 func GetShapeType(value int32) (Shape, error) {
 	switch value {
 	case 0:

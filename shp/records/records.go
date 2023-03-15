@@ -52,7 +52,7 @@ func ParseRecords(f *os.File) Records {
 		var shapeType int32
 		utils.ReadBinary(b[0:4], binary.LittleEndian, &shapeType)
 		shape, err := shapes.GetShapeType(shapeType)
-		shape.ParseShape(b)
+		shape.Parse(b)
 		record.shape = shape
 		records.Append(record)
 	}
