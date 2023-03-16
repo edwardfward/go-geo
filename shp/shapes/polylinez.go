@@ -13,8 +13,8 @@ func (p *PolyLineZ) Parse(b []byte) {
 }
 
 // Type todo documentation
-func (p *PolyLineZ) Type() int32 {
-	return 13
+func (p *PolyLineZ) Type() ShapeType {
+	return POLYLINEZ
 }
 
 // todo documentation

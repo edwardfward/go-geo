@@ -7,8 +7,8 @@ func (n *NullShape) Parse([]byte) {
 
 }
 
-func (n *NullShape) Type() int32 {
-	return 0
+func (n *NullShape) Type() ShapeType {
+	return NULLSHAPE
 }
 
 func (n *NullShape) String() string {

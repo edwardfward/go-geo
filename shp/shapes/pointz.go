@@ -11,8 +11,8 @@ func (p *PointZ) Parse(b []byte) {
 
 }
 
-func (p *PointZ) Type() int32 {
-	return 11
+func (p *PointZ) Type() ShapeType {
+	return POINTZ
 }
 
 func (p *PointZ) String() string {

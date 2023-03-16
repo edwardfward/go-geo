@@ -24,8 +24,8 @@ func (p *Point) Parse(r []byte) {
 }
 
 // Type todo add documentation
-func (p *Point) Type() int32 {
-	return 1
+func (p *Point) Type() ShapeType {
+	return POINT
 }
 
 func (p *Point) String() string {

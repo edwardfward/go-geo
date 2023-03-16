@@ -17,8 +17,8 @@ func (p *PolyLineM) Parse(b []byte) {
 }
 
 // Type todo documentation
-func (p *PolyLineM) Type() int32 {
-	return 23
+func (p *PolyLineM) Type() ShapeType {
+	return POLYLINEM
 }
 
 // todo documentation

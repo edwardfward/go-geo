@@ -14,8 +14,8 @@ func (p *PolygonM) Parse(b []byte) {
 
 }
 
-func (p *PolygonM) Type() int32 {
-	return 25
+func (p *PolygonM) Type() ShapeType {
+	return POLYLINEM
 }
 
 func (p *PolygonM) String() string {

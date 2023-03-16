@@ -15,8 +15,8 @@ func (m *MultiPointM) Parse(r []byte) {
 }
 
 // Type todo documentation
-func (m *MultiPointM) Type() int32 {
-	return 28
+func (m *MultiPointM) Type() ShapeType {
+	return MULTIPOINTM
 }
 
 func (m *MultiPointM) String() string {

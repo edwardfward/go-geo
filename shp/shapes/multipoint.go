@@ -19,7 +19,8 @@ func (m *MultiPoint) Parse(r []byte) {
 	_box := r[4:36]
 	_points := r[36:40]
 
-	var shape, numberPoints int32
+	var numberPoints int32
+	var shape ShapeType
 
 	// verify the shape is correct
 	utils.ReadBinary(_shape, binary.LittleEndian, &shape)
@@ -43,8 +44,8 @@ func (m *MultiPoint) Parse(r []byte) {
 }
 
 // Type todo documentation
-func (m *MultiPoint) Type() int32 {
-	return 8
+func (m *MultiPoint) Type() ShapeType {
+	return MULTIPOINT
 }
 
 func (m *MultiPoint) String() string {

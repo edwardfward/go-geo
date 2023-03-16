@@ -49,7 +49,7 @@ func ParseRecords(f *os.File) Records {
 		if n == 0 || err != nil {
 			log.Fatalf("no shape data in record")
 		}
-		var shapeType int32
+		var shapeType shapes.ShapeType
 		utils.ReadBinary(b[0:4], binary.LittleEndian, &shapeType)
 		shape, err := shapes.GetShapeType(shapeType)
 		shape.Parse(b)

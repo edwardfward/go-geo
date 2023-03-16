@@ -22,7 +22,8 @@ func (p *Polygon) Parse(r []byte) {
 	_parts := r[36:40]
 	_points := r[40:44]
 
-	var shapeType, parts, points int32
+	var parts, points int32
+	var shapeType ShapeType
 
 	// verify the shape is correct
 	utils.ReadBinary(_shapeType, binary.LittleEndian, &shapeType)
@@ -52,8 +53,8 @@ func (p *Polygon) Parse(r []byte) {
 }
 
 // Type todo documentation
-func (p *Polygon) Type() int32 {
-	return 5
+func (p *Polygon) Type() ShapeType {
+	return POLYGON
 }
 
 // NumberParts todo documentation

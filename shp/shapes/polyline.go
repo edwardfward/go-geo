@@ -55,8 +55,8 @@ func (p *PolyLine) Parse(r []byte) {
 }
 
 // Type todo documentation
-func (p *PolyLine) Type() int32 {
-	return 3
+func (p *PolyLine) Type() ShapeType {
+	return POLYLINE
 }
 
 // todo documentation

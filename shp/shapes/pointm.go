@@ -10,8 +10,8 @@ func (p *PointM) Parse(b []byte) {
 
 }
 
-func (p *PointM) Type() int32 {
-	return 21
+func (p *PointM) Type() ShapeType {
+	return POINTM
 }
 
 func (p *PointM) String() string {

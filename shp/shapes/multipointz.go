@@ -10,8 +10,8 @@ func (m *MultiPointZ) Parse(b []byte) {
 
 }
 
-func (m *MultiPointZ) Type() int32 {
-	return 18
+func (m *MultiPointZ) Type() ShapeType {
+	return MULTIPOINTZ
 }
 
 func (m *MultiPointZ) String() string {

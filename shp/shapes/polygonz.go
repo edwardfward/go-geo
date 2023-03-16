@@ -10,8 +10,8 @@ func (p *PolygonZ) Parse(b []byte) {
 
 }
 
-func (p *PolygonZ) Type() int32 {
-	return 15
+func (p *PolygonZ) Type() ShapeType {
+	return POLYGONZ
 }
 
 func (p *PolygonZ) String() string {

@@ -2,17 +2,36 @@ package shapes
 
 import (
 	"encoding/binary"
-	"errors"
+	"fmt"
 	"go-shp/utils"
 	"log"
+)
+
+type ShapeType int32
+
+const (
+	NULLSHAPE   ShapeType = 0
+	POINT       ShapeType = 1
+	POLYLINE    ShapeType = 3
+	POLYGON     ShapeType = 5
+	MULTIPOINT  ShapeType = 8
+	POINTZ      ShapeType = 11
+	POLYLINEZ   ShapeType = 13
+	POLYGONZ    ShapeType = 15
+	MULTIPOINTZ ShapeType = 18
+	POINTM      ShapeType = 21
+	POLYLINEM   ShapeType = 23
+	POLYGONM    ShapeType = 25
+	MULTIPOINTM ShapeType = 28
+	MULTIPATCH  ShapeType = 31
 )
 
 // Shape todo documentation
 type Shape interface {
 	Parse([]byte)
-	Type() int32
-	String() string
+	Type() ShapeType
 	New() Shape
+	String() string
 }
 
 // BoundaryBox todo documentation
@@ -35,36 +54,38 @@ func NewBoundaryBox(box []byte) [2]Point {
 }
 
 // GetShapeType todo documentation
-func GetShapeType(value int32) (Shape, error) {
+func GetShapeType(value ShapeType) (Shape, error) {
 	switch value {
-	case 0:
+	case NULLSHAPE:
 		return &NullShape{}, nil
-	case 1:
+	case POINT:
 		return &Point{}, nil
-	case 3:
+	case POLYLINE:
 		return &PolyLine{}, nil
-	case 5:
+	case POLYGON:
 		return &Polygon{}, nil
-	case 8:
+	case MULTIPOINT:
 		return &MultiPoint{}, nil
-	case 11:
+	case POINTZ:
 		return &PointZ{}, nil
-	case 13:
+	case POLYLINEZ:
 		return &PolyLineZ{}, nil
-	case 15:
+	case POLYGONZ:
 		return &PolygonZ{}, nil
-	case 18:
+	case MULTIPOINTZ:
 		return &MultiPointZ{}, nil
-	case 21:
+	case POINTM:
 		return &PointM{}, nil
-	case 23:
+	case POLYLINEM:
 		return &PolyLineM{}, nil
-	case 25:
+	case POLYGONM:
 		return &PolygonM{}, nil
-	case 28:
+	case MULTIPOINTM:
 		return &MultiPointM{}, nil
-		// case 31: [todo] implement MultiPatchShape
-		// return MultiPatchShape, nil
+	case MULTIPATCH:
+		return &MultiPatch{}, nil
+	default:
+		return &NullShape{}, fmt.Errorf(": unrecognized shapetype value: %v", value)
+
 	}
-	return &NullShape{}, errors.New("not a valid shape value")
 }

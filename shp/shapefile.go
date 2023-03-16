@@ -23,7 +23,7 @@ func (s *ShapeFile) String() string {
 		s.records.NumberOfShapes())
 }
 
-// ParseShapeFile todo documentation
+// ParseShapeFile todo documentation and add meaningful error propagation
 func ParseShapeFile(filePath string) *ShapeFile {
 	// [todo] check for *.shp extension
 	// open shapefile
