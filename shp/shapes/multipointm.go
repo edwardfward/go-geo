@@ -47,8 +47,8 @@ func (m *MultiPointM) Parse(r []byte) {
 		offset = offset + 16
 
 		for x := int32(0); x < points; x++ {
-			offset += 8 * int(x) // shape header + points + mMin + mMax
-			_m := r[offset : offset+8]
+			offset += 8 * int(x)       // shape header + points + mMin + mMax
+			_m := r[offset : offset+8] // read measure float64 little endian
 			var measure float64
 			utils.ReadBinary(_m, binary.LittleEndian, &m)
 			m.measures = append(m.measures, measure)
