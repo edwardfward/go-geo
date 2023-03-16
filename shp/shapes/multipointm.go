@@ -53,9 +53,7 @@ func (m *MultiPointM) Parse(r []byte) {
 			utils.ReadBinary(_m, binary.LittleEndian, &m)
 			m.measures = append(m.measures, measure)
 		}
-
 	}
-
 }
 
 // Type todo documentation
