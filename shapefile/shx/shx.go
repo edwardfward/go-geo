@@ -1,7 +1,7 @@
 package shx
 
 import (
-	"go-shp/shp/records"
+	"go-shp/shapefile/shp/records"
 )
 
 type IndexFile struct {
