@@ -1,3 +1,3 @@
-module go-shp
+module go-geo
 
 go 1.20

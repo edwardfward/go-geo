@@ -1,4 +1,3 @@
 package records
 
-type PointsZ struct {
-}
+type PointsZ struct{}

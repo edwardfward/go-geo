@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"go-shp/shapefile/shp/records"
+
+	"go-geo/shapefile/shp/records"
 )
 
 const (
 	FILECODE              int32 = 9994
 	VERSION               int32 = 1000
-	SHAPEFILEHEADERLENGTH int   = 1000
+	SHAPEFILEHEADERLENGTH int   = 100
 )
 
 type ShapeFileHeader struct {
@@ -23,7 +24,7 @@ type ShapeFileHeader struct {
 	mRange     [2]float64          // [min, max] measure
 }
 
-func Parse(header []byte) error {
+func (h *ShapeFileHeader) Parse(header []byte) error {
 	// check to ensure header is proper length
 	if len(header) != SHAPEFILEHEADERLENGTH {
 		return fmt.Errorf(" expected header of %d bytes, received %d bytes",
@@ -36,7 +37,6 @@ func Parse(header []byte) error {
 	// parse and check file code equals 9994
 	err := binary.Read(bytes.NewReader(header[0:4]),
 		binary.BigEndian, &shapeHeader.fileCode)
-
 	if err != nil {
 		return fmt.Errorf("unable to parse file code")
 	}
@@ -78,13 +78,26 @@ func Parse(header []byte) error {
 	}
 
 	// parse boundary box
-	b, err := records.NewBoundaryBox(header[36:68])
+	shapeHeader.box, err = records.ParseBoundaryBox(header[36:68])
 	if err != nil {
-		return fmt.Errorf("unable to parse shapefile boundary box: %v",
-			err)
+		return fmt.Errorf("%w: unable to parse boundary box", err)
 	}
 
-	shapeHeader.box = b
-
 	return nil
+}
+
+func (h *ShapeFileHeader) ShapeType() records.ShapeType {
+	return h.shape
+}
+
+func EmptyShapeFileHeader() ShapeFileHeader {
+	return ShapeFileHeader{
+		fileCode:   FILECODE,
+		fileLength: 0,
+		version:    VERSION,
+		shape:      records.NULLSHAPE,
+		box:        records.EmptyBoundaryBox(),
+		zRange:     [2]float64{0.0, 0.0},
+		mRange:     [2]float64{0.0, 0.0},
+	}
 }

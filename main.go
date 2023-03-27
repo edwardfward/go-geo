@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	"go-shp/shapefile/shp"
 	"log"
 	"os"
+
+	"go-geo/shapefile/shp"
 )
 
 func main() {
 	s, err := shp.ParseShapeFile("shp/samples/tl_rd22_12001_addrfeat.shp")
 	if err != nil {
-		log.Fatalf("failed to parse shapefile: %v", err)
+		log.Fatalf("%v: failed to parse file", err)
 	}
 
 	_, err = fmt.Fprint(os.Stdout, s)

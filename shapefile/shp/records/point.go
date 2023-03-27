@@ -45,30 +45,61 @@ func (p *Point) LengthBytes() int32 {
 	return p.header.contentLength * WORDMULTIPLE // content length is number of 16-bit (2-byte) words
 }
 
-func ParsePoint(point []byte) (Point, error) {
+// ParsePoint returns a single point.
+func ParsePoint(pointBytes []byte) (Point, error) {
 	// check length to verify 16-bytes received
-	if len(point) != POINTLENGTH {
-		return Point{x: 0, y: 0},
-			fmt.Errorf("new point parse error: expected 16-bytes, received: %d",
-				len(point))
+	if len(pointBytes) != POINTLENGTH {
+		pointParseError := errors.New("error parsing point: incorrect length byte" +
+			"array received")
+
+		return EmptyPoint(),
+			fmt.Errorf("%w: expected %d received %d", pointParseError,
+				len(pointBytes), POINTLENGTH)
 	}
 
-	p := Point{x: 0, y: 0}
+	point := EmptyPoint()
 	// parse x-coordinate
-	err := binary.Read(bytes.NewReader(point[0:8]), binary.LittleEndian, &p.x)
+	err := binary.Read(bytes.NewReader(pointBytes[0:8]), binary.LittleEndian, &point.x)
 	if err != nil {
-		return p,
+		return point,
 			fmt.Errorf("new point parse error: unable to parse x-coordinate: %w",
 				err)
 	}
 	// parse y-coordinate
-	err = binary.Read(bytes.NewReader(point[8:16]), binary.LittleEndian, &p.y)
+	err = binary.Read(bytes.NewReader(pointBytes[8:16]), binary.LittleEndian, &point.y)
 	if err != nil {
-		return p,
-			fmt.Errorf("new point parse error: unable to parse y-coordinate: %v",
-				err)
+		return point,
+			fmt.Errorf("%w: unable to parse y-coordinate", err)
 	}
 
 	// completed parsing x and y
-	return p, nil
+	return point, nil
+}
+
+// ParsePoints returns one or more points for complex shapes (i.e. polyline).
+func ParsePoints(points []byte, numPoints int32) ([]Point, error) {
+	// check points bytes is the correct length for the number of points requested
+	if len(points) != int(numPoints*POINTLENGTH) {
+		return nil, errors.New("incorrect number of bytes received to parse number " +
+			"of points")
+	}
+
+	pointArray := make([]Point, numPoints)
+
+	// parse points
+	for index := int32(0); index < numPoints; index++ {
+		o, err := ParsePoint(points[POINTLENGTH*index : POINTLENGTH*index+POINTLENGTH])
+		if err != nil {
+			return nil, err
+		}
+
+		pointArray[index] = o
+	}
+
+	return pointArray, nil
+}
+
+// EmptyPoint returns an empty or default Point.
+func EmptyPoint() Point {
+	return Point{header: EmptyRecordHeader(), shape: POINT, x: 0, y: 0}
 }

@@ -1,6 +1,9 @@
 package records
 
 import (
+	"bytes"
+	"encoding/binary"
+	"errors"
 	"fmt"
 )
 
@@ -12,6 +15,7 @@ type Record interface {
 
 const (
 	WORDMULTIPLE = 2 // word represents two bytes in length
+	INT32LENGTH  = 4
 )
 
 type ShapeType int32
@@ -19,7 +23,7 @@ type ShapeType int32
 const (
 	NULLSHAPE ShapeType = 0
 	POINT     ShapeType = 1
-	// POLYLINE    ShapeType = 3
+	POLYLINE  ShapeType = 3
 	// POLYGON     ShapeType = 5
 	// MULTIPOINT  ShapeType = 8
 	// POINTZ      ShapeType = 11
@@ -30,45 +34,77 @@ const (
 	// POLYLINEM   ShapeType = 23
 	// POLYGONM    ShapeType = 25
 	// MULTIPOINTM ShapeType = 28
-	// MULTIPATCH  ShapeType = 31
+	// MULTIPATCH  ShapeType = 31.
 )
 
 // GetShapeType todo documentation.
 func GetShapeType(value ShapeType) (Record, error) {
+	var shape Record
+
 	switch value {
 	case NULLSHAPE:
-		return &NullShape{header: RecordHeader{recordNumber: 0, contentLength: 0},
-			shape: NULLSHAPE}, nil
+		result := EmptyNullShape()
+		shape = &result
 	case POINT:
-		return &Point{header: RecordHeader{recordNumber: 0, contentLength: 0},
-			x: 0, y: 0, shape: POINT}, nil
-	//case POLYLINE:
-	//	return &PolyLine{}, nil
-	//case POLYGON:
+		result := EmptyPoint()
+		shape = &result
+	case POLYLINE:
+		result := EmptyPolyLine()
+		shape = &result
+	// case POLYGON:
 	//	return &Polygon{}, nil
-	//case MULTIPOINT:
+	// case MULTIPOINT:
 	//	return &MultiPoint{}, nil
-	//case POINTZ:
+	// case POINTZ:
 	//	return &PointZ{x: 0, y: 0, z: 0, m: 0}, nil
-	//case POLYLINEZ:
+	// case POLYLINEZ:
 	//	return &PolyLineZ{}, nil
-	//case POLYGONZ:
+	// case POLYGONZ:
 	//	return &PolygonZ{}, nil
-	//case MULTIPOINTZ:
+	// case MULTIPOINTZ:
 	//	return &MultiPointZ{}, nil
-	//case POINTM:
+	// case POINTM:
 	//	return &PointM{}, nil
-	//case POLYLINEM:
+	// case POLYLINEM:
 	//	return &PolyLineM{}, nil
-	//case POLYGONM:
+	// case POLYGONM:
 	//	return &PolygonM{}, nil
-	//case MULTIPOINTM:
+	// case MULTIPOINTM:
 	//	return &MultiPointM{}, nil
-	//case MULTIPATCH:
+	// case MULTIPATCH:
 	//	return &MultiPatch{}, nil
 	default:
-		return &NullShape{header: RecordHeader{recordNumber: 0, contentLength: 0},
-				shape: NULLSHAPE},
-			fmt.Errorf(": unrecognized shapetype value: %v", value)
+		result := EmptyNullShape()
+		shape = &result
+
+		unrecognizedShapeError := errors.New("unrecognized shape type value")
+
+		return shape, fmt.Errorf("%w: %d", unrecognizedShapeError, value)
 	}
+
+	return shape, nil
+}
+
+func ParseParts(parts []byte, numParts int32) ([]int32, error) {
+	// check right number of bytes received to parts number of parts
+	if len(parts) != int(numParts*INT32LENGTH) {
+		return nil, errors.New("incorrect number of bytes received to parse " +
+			"number of parts requested")
+	}
+
+	partsArray := make([]int32, numParts)
+
+	for index := 0; index < int(numParts); index++ {
+		var part int32
+
+		err := binary.Read(bytes.NewReader(parts[index*INT32LENGTH:index*INT32LENGTH+INT32LENGTH]),
+			binary.LittleEndian, &part)
+		if err != nil {
+			return nil, err
+		}
+
+		partsArray[index] = part
+	}
+
+	return partsArray, nil
 }

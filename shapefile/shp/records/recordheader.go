@@ -3,6 +3,7 @@ package records
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 )
 
@@ -15,31 +16,44 @@ const (
 	RECORDHEADERLENGTH = 8 // bytes
 )
 
-func ParseRecordHeader(headerSlice []byte) (RecordHeader, error) {
-	header := RecordHeader{recordNumber: 0, contentLength: 0}
+func (h *RecordHeader) LengthBytes() int {
+	return int(h.contentLength * WORDMULTIPLE)
+}
+
+func (h *RecordHeader) RecordNumber() int {
+	return int(h.recordNumber)
+}
+
+func (h *RecordHeader) Parse(headerSlice []byte) error {
+	header := EmptyRecordHeader()
 
 	// check record header is 4 words (8 bytes) long
 	if len(headerSlice) != RECORDHEADERLENGTH {
-		return header,
-			fmt.Errorf("error parsing record header: incorrect bytes received: %d",
-				len(headerSlice))
+		incorrectHeaderLength := errors.New("unable to parse record header")
+
+		return fmt.Errorf("%w: expected %d bytes, received %d", incorrectHeaderLength,
+			RECORDHEADERLENGTH,
+			len(headerSlice))
 	}
 
 	// parse record number
 	err := binary.Read(bytes.NewReader(headerSlice[0:4]), binary.BigEndian,
 		&header.recordNumber)
 	if err != nil {
-		return header, fmt.Errorf("unable to parse record number from record header: %w",
-			err)
+		return fmt.Errorf("%w: unable to read record number bytes", err)
 	}
 
 	// parse contentlength in 16-bit (2 byte) words
 	err = binary.Read(bytes.NewReader(headerSlice[4:8]), binary.BigEndian,
 		&header.contentLength)
 	if err != nil {
-		return header, fmt.Errorf("unable to parse content length from record header: %w",
-			err)
+		return fmt.Errorf("%w: unable to read content length bytes", err)
 	}
 
-	return header, nil
+	return nil
+}
+
+// EmptyRecordHeader returns an empty RecordHeader.
+func EmptyRecordHeader() RecordHeader {
+	return RecordHeader{recordNumber: 0, contentLength: 0}
 }

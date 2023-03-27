@@ -3,6 +3,7 @@ package records
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 )
 
@@ -17,8 +18,10 @@ const (
 
 func (n *NullShape) Parse(record []byte, header RecordHeader) error {
 	if len(record) != NULLSHAPELENGTH {
-		return fmt.Errorf("nullshape parse failed: incorrect number of bytes (%d) for nullshape",
-			len(record))
+		nullShapeFail := errors.New("nullshape parse failed")
+
+		return fmt.Errorf("%w: incorrect number of bytes: received %d, expected %d",
+			nullShapeFail, len(record), NULLSHAPELENGTH)
 	}
 
 	// read the first four bytes of the record to determine ShapeType
@@ -31,8 +34,10 @@ func (n *NullShape) Parse(record []byte, header RecordHeader) error {
 
 	// check to make sure parsed shape type matches record ShapeType
 	if n.shape != parsedShape {
-		return fmt.Errorf("parsed shapetype (%d) did not match null shapetype (%d)",
-			parsedShape, n.shape)
+		parseShapeType := errors.New("parsed shape type did not match null shape type")
+
+		return fmt.Errorf("%w: parsed: %d needed %d", parseShapeType,
+			parsedShape, NULLSHAPE)
 	}
 
 	n.header = header
@@ -40,14 +45,22 @@ func (n *NullShape) Parse(record []byte, header RecordHeader) error {
 	return nil
 }
 
+// RecordNumber returns the null shape's record number.
 func (n *NullShape) RecordNumber() int32 {
 	return n.header.recordNumber
 }
 
+// LengthBytes returns the null shape record's length in bytes.
 func (n *NullShape) LengthBytes() int32 {
 	return n.header.contentLength * WORDMULTIPLE // content length is number of 16-bit (2 byte) words
 }
 
+// RecordType returns the null shape's shape type.
 func (n *NullShape) RecordType() ShapeType {
 	return n.shape
+}
+
+// EmptyNullShape returns an empty or default null shape.
+func EmptyNullShape() NullShape {
+	return NullShape{header: EmptyRecordHeader(), shape: NULLSHAPE}
 }
