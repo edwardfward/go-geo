@@ -29,7 +29,7 @@ func ParseRecordHeader(headerSlice []byte) (RecordHeader, error) {
 	err := binary.Read(bytes.NewReader(headerSlice[0:4]), binary.BigEndian,
 		&header.recordNumber)
 	if err != nil {
-		return header, fmt.Errorf("unable to parse record number from record header: %v",
+		return header, fmt.Errorf("unable to parse record number from record header: %w",
 			err)
 	}
 

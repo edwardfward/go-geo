@@ -18,8 +18,6 @@ type ShapeFile struct {
 
 // ParseShapeFile todo documentation and add meaningful error propagation.
 func ParseShapeFile(filePath string) (*ShapeFile, error) {
-	// todo check for *.shp extension
-
 	// open shapefile
 	file, err := os.Open(filePath)
 

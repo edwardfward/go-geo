@@ -83,8 +83,8 @@ func Parse(header []byte) error {
 		return fmt.Errorf("unable to parse shapefile boundary box: %v",
 			err)
 	}
+
 	shapeHeader.box = b
 
 	return nil
-
 }

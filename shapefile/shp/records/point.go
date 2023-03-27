@@ -58,7 +58,7 @@ func ParsePoint(point []byte) (Point, error) {
 	err := binary.Read(bytes.NewReader(point[0:8]), binary.LittleEndian, &p.x)
 	if err != nil {
 		return p,
-			fmt.Errorf("new point parse error: unable to parse x-coordinate: %v",
+			fmt.Errorf("new point parse error: unable to parse x-coordinate: %w",
 				err)
 	}
 	// parse y-coordinate
