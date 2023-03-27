@@ -22,8 +22,6 @@ test_coverage:
 
 dep:
 	go mod download
-	go install mvdan.cc/gofumpt@latest
-	go install github.com/daixiang0/gci@latest
 
 vet:
 	go vet
@@ -31,5 +29,4 @@ vet:
 # https://golangci-lint.run/ for more options and linters
 
 lint:
-	gci write --skip-generated -s standard -s default .
 	golangci-lint run
