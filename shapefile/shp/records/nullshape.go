@@ -18,7 +18,7 @@ const (
 
 func (n *NullShape) Parse(record []byte, header RecordHeader) error {
 	if len(record) != NULLSHAPELENGTH {
-		nullShapeFail := errors.New("nullshape parse failed")
+		nullShapeFail := errors.New("[nullshape.go] nullshape parse failed")
 
 		return fmt.Errorf("%w: incorrect number of bytes: received %d, expected %d",
 			nullShapeFail, len(record), NULLSHAPELENGTH)

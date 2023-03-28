@@ -25,8 +25,6 @@ func (h *RecordHeader) RecordNumber() int {
 }
 
 func (h *RecordHeader) Parse(headerSlice []byte) error {
-	header := EmptyRecordHeader()
-
 	// check record header is 4 words (8 bytes) long
 	if len(headerSlice) != RECORDHEADERLENGTH {
 		incorrectHeaderLength := errors.New("unable to parse record header")
@@ -38,14 +36,14 @@ func (h *RecordHeader) Parse(headerSlice []byte) error {
 
 	// parse record number
 	err := binary.Read(bytes.NewReader(headerSlice[0:4]), binary.BigEndian,
-		&header.recordNumber)
+		&h.recordNumber)
 	if err != nil {
 		return fmt.Errorf("%w: unable to read record number bytes", err)
 	}
 
 	// parse contentlength in 16-bit (2 byte) words
 	err = binary.Read(bytes.NewReader(headerSlice[4:8]), binary.BigEndian,
-		&header.contentLength)
+		&h.contentLength)
 	if err != nil {
 		return fmt.Errorf("%w: unable to read content length bytes", err)
 	}

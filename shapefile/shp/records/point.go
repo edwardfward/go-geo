@@ -80,8 +80,10 @@ func ParsePoint(pointBytes []byte) (Point, error) {
 func ParsePoints(points []byte, numPoints int32) ([]Point, error) {
 	// check points bytes is the correct length for the number of points requested
 	if len(points) != int(numPoints*POINTLENGTH) {
-		return nil, errors.New("incorrect number of bytes received to parse number " +
-			"of points")
+		var pointParseError = errors.New("failed to parse point")
+
+		return nil, fmt.Errorf("%w: received %d bytes for %d points (%d-bytes)",
+			pointParseError, len(points), numPoints, numPoints*POINTLENGTH)
 	}
 
 	pointArray := make([]Point, numPoints)

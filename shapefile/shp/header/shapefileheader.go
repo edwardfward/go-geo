@@ -27,58 +27,55 @@ type ShapeFileHeader struct {
 func (h *ShapeFileHeader) Parse(header []byte) error {
 	// check to ensure header is proper length
 	if len(header) != SHAPEFILEHEADERLENGTH {
-		return fmt.Errorf(" expected header of %d bytes, received %d bytes",
+		return fmt.Errorf("expected header of %d bytes, received %d bytes",
 			len(header), SHAPEFILEHEADERLENGTH)
 	}
 
-	// start parsing the header
-	shapeHeader := new(ShapeFileHeader)
-
 	// parse and check file code equals 9994
 	err := binary.Read(bytes.NewReader(header[0:4]),
-		binary.BigEndian, &shapeHeader.fileCode)
+		binary.BigEndian, &h.fileCode)
 	if err != nil {
 		return fmt.Errorf("unable to parse file code")
 	}
 
-	if shapeHeader.fileCode != FILECODE {
+	if h.fileCode != FILECODE {
 		return fmt.Errorf("parsed file code (%d) not equal to %d",
-			shapeHeader.fileCode, FILECODE)
+			h.fileCode, FILECODE)
 	}
 
 	// parse file length (16-bit words)
 	err = binary.Read(bytes.NewReader(header[24:28]),
-		binary.BigEndian, &shapeHeader.fileLength)
+		binary.BigEndian, &h.fileLength)
 	if err != nil {
-		return fmt.Errorf("unable to parse file length: %v", err)
+		return fmt.Errorf("unable to parse file length: %w", err)
 	}
 
 	// parse and check version
 	err = binary.Read(bytes.NewReader(header[28:32]),
-		binary.LittleEndian, &shapeHeader.version)
+		binary.LittleEndian, &h.version)
 	if err != nil {
-		return fmt.Errorf("unable to parse file version: %v", err)
+		return fmt.Errorf("unable to parse file version: %w", err)
 	}
 
-	if shapeHeader.version != VERSION {
+	if h.version != VERSION {
 		return fmt.Errorf("parsed version (%d) not equal to %d",
-			shapeHeader.version, VERSION)
+			h.version, VERSION)
 	}
 
 	// parse and check ShapeType
 	err = binary.Read(bytes.NewReader(header[32:36]),
-		binary.LittleEndian, &shapeHeader.shape)
+		binary.LittleEndian, &h.shape)
 	if err != nil {
-		return fmt.Errorf("unable to parse shape type: %v",
+		return fmt.Errorf("unable to parse shape type: %w",
 			err)
 	}
 	// check if valid shape type
-	if _, err := records.GetShapeType(shapeHeader.shape); err != nil {
-		return fmt.Errorf("invalid shape type received: %v", err)
+	if _, err := records.GetShapeType(h.shape); err != nil {
+		return fmt.Errorf("invalid shape type received: %w", err)
 	}
 
 	// parse boundary box
-	shapeHeader.box, err = records.ParseBoundaryBox(header[36:68])
+	h.box, err = records.ParseBoundaryBox(header[36:68])
 	if err != nil {
 		return fmt.Errorf("%w: unable to parse boundary box", err)
 	}

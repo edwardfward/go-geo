@@ -15,7 +15,7 @@ clean:
 	rm ${BINARY_NAME}-windows
 
 test:
-	go test ./...
+	go test -v ./...
 
 test_coverage:
 	go test ./... -coverprofile=coverage.out
@@ -29,4 +29,5 @@ vet:
 # https://golangci-lint.run/ for more options and linters
 
 lint:
+	gofmt -s -w .
 	golangci-lint run
