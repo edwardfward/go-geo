@@ -1,11 +1,9 @@
-package records_test
+package records
 
 import (
 	"bytes"
 	"encoding/binary"
 	"testing"
-
-	"go-geo/shapefile/shp/records"
 )
 
 func TestParseParts(t *testing.T) {
@@ -27,7 +25,7 @@ func TestParseParts(t *testing.T) {
 			t.Fatalf("binary.Write failed: %v\n", err)
 		}
 
-		parts, er := records.ParseParts(buf.Bytes(), numPoints)
+		parts, er := ParseParts(buf.Bytes(), numPoints)
 		if er != nil {
 			t.Fatalf("ParseParts failed")
 		}
@@ -57,7 +55,7 @@ func TestParseParts(t *testing.T) {
 			t.Fatalf("binary.Write failed: %v", err)
 		}
 
-		_, err = records.ParseParts(buf.Bytes(), numPoints)
+		_, err = ParseParts(buf.Bytes(), numPoints)
 		if err == nil {
 			t.Fatalf("parsed a bad parts byte sequence")
 		}
