@@ -68,8 +68,6 @@ func (s *ShapeFile) Parse(file *os.File) error {
 
 	s.header = header.EmptyShapeFileHeader()
 
-	log.Printf("header length: %d\n", len(headerBytes))
-
 	err = s.header.Parse(headerBytes)
 	if err != nil {
 		return fmt.Errorf("%w: error parsing shapefile header", err)

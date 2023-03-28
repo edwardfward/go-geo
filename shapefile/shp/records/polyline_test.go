@@ -3,12 +3,12 @@ package records_test
 import (
 	"bytes"
 	"encoding/binary"
-	"go-geo/shapefile/shp/records"
 	"testing"
+
+	"go-geo/shapefile/shp/records"
 )
 
 func TestParseParts(t *testing.T) {
-
 	// test good byte sequence with two parts
 	t.Run("Good byte sequence", func(t *testing.T) {
 		buf := new(bytes.Buffer)
