@@ -88,3 +88,28 @@ func ParseRecords(file *os.File, shape ShapeType) ([]Record, error) {
 
 	return records, nil
 }
+
+// ParsePoints returns one or more points for complex shapes (i.e. polyline).
+func ParsePoints(points []byte, numPoints int32) ([]Point, error) {
+	// check points bytes is the correct length for the number of points requested
+	if len(points) != int(numPoints*POINTLENGTH) {
+		var pointParseError = errors.New("failed to parse point")
+
+		return nil, fmt.Errorf("%w: received %d bytes for %d points (%d-bytes)",
+			pointParseError, len(points), numPoints, numPoints*POINTLENGTH)
+	}
+
+	pointArray := make([]Point, numPoints)
+
+	// parse points
+	for index := int32(0); index < numPoints; index++ {
+		o, err := ParsePoint(points[POINTLENGTH*index : POINTLENGTH*index+POINTLENGTH])
+		if err != nil {
+			return nil, err
+		}
+
+		pointArray[index] = o
+	}
+
+	return pointArray, nil
+}
