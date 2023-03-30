@@ -3,12 +3,10 @@ package records
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 )
 
 type PolyLine struct {
-	header    RecordHeader
 	shape     ShapeType
 	box       BoundaryBox
 	numParts  int32
@@ -17,77 +15,57 @@ type PolyLine struct {
 	points    []Point
 }
 
-func (p *PolyLine) Parse(record []byte, header RecordHeader) error {
-	// check length of record equals header contentlength in bytes
-	if len(record) != header.LengthBytes() {
-		var polylineByteLengthError = errors.New("incorrect number of bytes received")
+func (p *PolyLine) Parse(record []byte) error {
+	// create temporary struct to determine number of parts and points
+	// to determine array size before parsing complete point
+	initial := struct {
+		Shape     ShapeType   // int32 4-bytes
+		Box       BoundaryBox // 4 * float64 32-bytes
+		NumParts  int32       // 4-bytes
+		NumPoints int32       // 4-bytes
+	}{}
 
-		return fmt.Errorf("%w: received %d expected %d", polylineByteLengthError,
-			len(record), header.LengthBytes())
+	// parse shape, box, numparts, and numpoints
+	if err := binary.Read(bytes.NewReader(record[:44]),
+		binary.LittleEndian, &initial); err != nil {
+		return fmt.Errorf("error parsing record information: %w", err)
 	}
 
-	// parse shape type
-	err := binary.Read(bytes.NewReader(record[0:4]), binary.LittleEndian, &p.shape)
-	if err != nil {
-		return errors.New("failed to parse polyline shape type")
+	// check numparts and numpoints positive
+	if initial.NumParts < 0 || initial.NumPoints < 0 {
+		return fmt.Errorf("error parsing number of points or parts: cannot have negative " +
+			"number of points or parts")
 	}
 
-	// check shape type
-	if p.shape != POLYLINE {
-		return errors.New("parsed shape type does not match")
+	p.shape, p.box = initial.Shape, initial.Box
+	p.numParts, p.numPoints = initial.NumParts, initial.NumPoints
+
+	parts := make([]int32, p.numParts)
+	points := make([]Point, p.numPoints)
+
+	// parse polyline part array
+	if err := binary.Read(bytes.NewReader(record[44:44+int(p.numParts)*4]),
+		binary.LittleEndian, &parts); err != nil {
+		return fmt.Errorf("error parsing polyline part array: %w", err)
 	}
 
-	// parse polyline boundary box
-	p.box, err = ParseBoundaryBox(record[4:36])
-	if err != nil {
-		return fmt.Errorf("%w: failed to parse polyline boundary box", err)
+	// parse polyline point array
+	if err := binary.Read(bytes.NewReader(record[44+int(p.numParts)*4:]),
+		binary.LittleEndian, &points); err != nil {
+		return fmt.Errorf("error parsing polyline point array: %w", err)
 	}
 
-	// parse number of polyline parts
-	err = binary.Read(bytes.NewReader(record[36:40]), binary.LittleEndian, &p.numParts)
-	if err != nil {
-		return fmt.Errorf("%w: failed to read polyline number of parts", err)
-	}
-
-	p.parts = make([]int32, p.numParts)
-
-	// parse number of points
-	err = binary.Read(bytes.NewReader(record[40:44]), binary.LittleEndian, &p.numPoints)
-	if err != nil {
-		return fmt.Errorf("%w: failed to read number of polyline points", err)
-	}
-
-	p.parts, err = ParseParts(record[44:44+p.numParts*INT32LENGTH], p.numParts)
-	if err != nil {
-		return fmt.Errorf("%w: failed to read number of polyline parts", err)
-	}
-
-	p.points, err = ParsePoints(record[44+p.numParts*INT32LENGTH:], p.numPoints)
-	if err != nil {
-		return fmt.Errorf("%w: failed to parse polyline points", err)
-	}
+	// assign parts and points arrays
+	p.parts, p.points = parts, points
 
 	return nil
 }
 
-// RecordNumber returns the polyline's record number.
-func (p *PolyLine) RecordNumber() int32 {
-	return p.header.recordNumber
-}
-
-// LengthBytes returns the length of the polyline record in bytes
-// does not include the header (4 bytes).
-func (p *PolyLine) LengthBytes() int32 {
-	return p.header.contentLength * WORDMULTIPLE
-}
-
 func EmptyPolyLine() PolyLine {
-	return PolyLine{
-		header:    EmptyRecordHeader(),
-		shape:     POLYLINE,
+	return PolyLine{shape: POLYLINE,
 		box:       EmptyBoundaryBox(),
 		numParts:  0,
 		numPoints: 0,
-		parts:     nil, points: nil,
-	}
+		parts:     nil,
+		points:    nil}
 }

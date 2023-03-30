@@ -36,9 +36,7 @@ func ParseShapeFile(filePath string) (*ShapeFile, error) {
 	}()
 
 	shapeFile := EmptyShapeFile()
-	err = shapeFile.Parse(file)
-
-	if err != nil {
+	if err := shapeFile.Parse(file); err != nil {
 		return &shapeFile, fmt.Errorf("%w: [shapefile.go] unable to parse file", err)
 	}
 
@@ -59,24 +57,21 @@ func (s *ShapeFile) Parse(file *os.File) error {
 	// parse shapefile header
 	headerBytes := make([]byte, header.SHAPEFILEHEADERLENGTH)
 
-	n, err := file.Read(headerBytes)
-	if n != header.SHAPEFILEHEADERLENGTH || err != nil {
-		headerParseError := errors.New("unable to parse shapefile header")
-
-		return fmt.Errorf("%w: error reading shapefile header", headerParseError)
+	if _, err := file.Read(headerBytes); err != nil {
+		return fmt.Errorf("error reading shape file header bytes: %w", err)
 	}
 
 	s.header = header.EmptyShapeFileHeader()
 
-	err = s.header.Parse(headerBytes)
-	if err != nil {
+	if err := s.header.Parse(headerBytes); err != nil {
 		return fmt.Errorf("%w: error parsing shapefile header", err)
 	}
 
 	// parse shapefile records
-	s.records, err = records.ParseRecords(file, s.header.ShapeType())
-	if err != nil {
-		return fmt.Errorf("%w: unable to parse shapefile records", err)
+	if shapeRecords, err := records.ParseRecords(file, s.header.ShapeType()); err != nil {
+		return fmt.Errorf("unable to parse shapefile records: %w", err)
+	} else {
+		s.records = shapeRecords
 	}
 
 	return nil

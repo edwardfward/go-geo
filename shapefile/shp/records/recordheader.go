@@ -8,8 +8,8 @@ import (
 )
 
 type RecordHeader struct {
-	recordNumber  int32 // record number big endian
-	contentLength int32 // 16-bit words big endian
+	RecordNumber  int32 // record number big endian
+	ContentLength int32 // 16-bit words big endian
 }
 
 const (
@@ -17,11 +17,7 @@ const (
 )
 
 func (h *RecordHeader) LengthBytes() int {
-	return int(h.contentLength * WORDMULTIPLE)
-}
-
-func (h *RecordHeader) RecordNumber() int {
-	return int(h.recordNumber)
+	return int(h.ContentLength * WORDMULTIPLE)
 }
 
 func (h *RecordHeader) Parse(headerSlice []byte) error {
@@ -34,18 +30,10 @@ func (h *RecordHeader) Parse(headerSlice []byte) error {
 			len(headerSlice))
 	}
 
-	// parse record number
-	err := binary.Read(bytes.NewReader(headerSlice[0:4]), binary.BigEndian,
-		&h.recordNumber)
+	// parse record
+	err := binary.Read(bytes.NewReader(headerSlice), binary.BigEndian, h)
 	if err != nil {
-		return fmt.Errorf("%w: unable to read record number bytes", err)
-	}
-
-	// parse contentlength in 16-bit (2 byte) words
-	err = binary.Read(bytes.NewReader(headerSlice[4:8]), binary.BigEndian,
-		&h.contentLength)
-	if err != nil {
-		return fmt.Errorf("%w: unable to read content length bytes", err)
+		return fmt.Errorf("%w: error parsing main record header", err)
 	}
 
 	return nil
@@ -53,5 +41,5 @@ func (h *RecordHeader) Parse(headerSlice []byte) error {
 
 // EmptyRecordHeader returns an empty RecordHeader.
 func EmptyRecordHeader() RecordHeader {
-	return RecordHeader{recordNumber: 0, contentLength: 0}
+	return RecordHeader{RecordNumber: 0, ContentLength: 0}
 }

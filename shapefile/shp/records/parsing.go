@@ -1,39 +1,11 @@
 package records
 
 import (
-	"bytes"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 )
-
-func ParseParts(parts []byte, numParts int32) ([]int32, error) {
-	// check right number of bytes received to parts number of parts
-	if len(parts) != int(numParts*INT32LENGTH) {
-		var partsParseError = errors.New("parts parse failure")
-
-		return nil, fmt.Errorf("%w : received %d bytes for %d parts", partsParseError,
-			len(parts), numParts)
-	}
-
-	partsArray := make([]int32, numParts)
-
-	for index := 0; index < int(numParts); index++ {
-		var part int32
-
-		err := binary.Read(bytes.NewReader(parts[index*INT32LENGTH:index*INT32LENGTH+INT32LENGTH]),
-			binary.LittleEndian, &part)
-		if err != nil {
-			return nil, fmt.Errorf("%w: failed to parse part", err)
-		}
-
-		partsArray[index] = part
-	}
-
-	return partsArray, nil
-}
 
 func ParseRecords(file *os.File, shape ShapeType) ([]Record, error) {
 	var records []Record
@@ -68,7 +40,7 @@ func ParseRecords(file *os.File, shape ShapeType) ([]Record, error) {
 
 		if numBytes != recordHeader.LengthBytes() || err != nil {
 			return records, fmt.Errorf("%w: unable to read record bytes for record %d",
-				err, recordHeader.RecordNumber())
+				err, recordHeader.RecordNumber)
 		}
 
 		record, recordError := GetShapeType(shape)
@@ -77,9 +49,7 @@ func ParseRecords(file *os.File, shape ShapeType) ([]Record, error) {
 				recordError)
 		}
 
-		err = record.Parse(recordBytes, recordHeader)
-
-		if err != nil {
+		if err = record.Parse(recordBytes); err != nil {
 			return records, fmt.Errorf("%w: error parsing record", err)
 		}
 
@@ -87,29 +57,4 @@ func ParseRecords(file *os.File, shape ShapeType) ([]Record, error) {
 	}
 
 	return records, nil
-}
-
-// ParsePoints returns one or more points for complex shapes (i.e. polyline).
-func ParsePoints(points []byte, numPoints int32) ([]Point, error) {
-	// check points bytes is the correct length for the number of points requested
-	if len(points) != int(numPoints*POINTLENGTH) {
-		var pointParseError = errors.New("failed to parse point")
-
-		return nil, fmt.Errorf("%w: received %d bytes for %d points (%d-bytes)",
-			pointParseError, len(points), numPoints, numPoints*POINTLENGTH)
-	}
-
-	pointArray := make([]Point, numPoints)
-
-	// parse points
-	for index := int32(0); index < numPoints; index++ {
-		o, err := ParsePoint(points[POINTLENGTH*index : POINTLENGTH*index+POINTLENGTH])
-		if err != nil {
-			return nil, err
-		}
-
-		pointArray[index] = o
-	}
-
-	return pointArray, nil
 }

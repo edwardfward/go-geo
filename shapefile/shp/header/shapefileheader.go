@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"log"
 
 	"go-geo/shapefile/shp/records"
 )
@@ -27,58 +28,43 @@ type ShapeFileHeader struct {
 func (h *ShapeFileHeader) Parse(header []byte) error {
 	// check to ensure header is proper length
 	if len(header) != SHAPEFILEHEADERLENGTH {
-		return fmt.Errorf("expected header of %d bytes, received %d bytes",
-			len(header), SHAPEFILEHEADERLENGTH)
+		return fmt.Errorf("error parsing shapefile: shape file headers need to " +
+			"be 100 bytes")
 	}
 
-	// parse and check file code equals 9994
-	err := binary.Read(bytes.NewReader(header[0:4]),
-		binary.BigEndian, &h.fileCode)
-	if err != nil {
-		return fmt.Errorf("unable to parse file code")
+	log.Printf("File header is %d bytes", len(header))
+
+	// parse header file code and file length
+	fileInfo := struct {
+		FileCode   int32
+		_          int32
+		_          int32
+		_          int32
+		_          int32
+		_          int32
+		FileLength int32
+	}{}
+
+	if err := binary.Read(bytes.NewReader(header[0:28]), binary.BigEndian, &fileInfo); err != nil {
+		return fmt.Errorf("error parsing shapefile file code and file length: %w", err)
 	}
 
-	if h.fileCode != FILECODE {
-		return fmt.Errorf("parsed file code (%d) not equal to %d",
-			h.fileCode, FILECODE)
+	// parse rest of shape file header
+	rest := struct {
+		Version int32
+		Shape   records.ShapeType
+		Box     records.BoundaryBox
+		ZBox    [2]float64
+		MBox    [2]float64
+	}{}
+
+	if err := binary.Read(bytes.NewReader(header[28:100]), binary.LittleEndian, &rest); err != nil {
+		return fmt.Errorf("error parsing shapefile version, type, bounding box, etc: %w", err)
 	}
 
-	// parse file length (16-bit words)
-	err = binary.Read(bytes.NewReader(header[24:28]),
-		binary.BigEndian, &h.fileLength)
-	if err != nil {
-		return fmt.Errorf("unable to parse file length: %w", err)
-	}
-
-	// parse and check version
-	err = binary.Read(bytes.NewReader(header[28:32]),
-		binary.LittleEndian, &h.version)
-	if err != nil {
-		return fmt.Errorf("unable to parse file version: %w", err)
-	}
-
-	if h.version != VERSION {
-		return fmt.Errorf("parsed version (%d) not equal to %d",
-			h.version, VERSION)
-	}
-
-	// parse and check ShapeType
-	err = binary.Read(bytes.NewReader(header[32:36]),
-		binary.LittleEndian, &h.shape)
-	if err != nil {
-		return fmt.Errorf("unable to parse shape type: %w",
-			err)
-	}
-	// check if valid shape type
-	if _, err := records.GetShapeType(h.shape); err != nil {
-		return fmt.Errorf("invalid shape type received: %w", err)
-	}
-
-	// parse boundary box
-	h.box, err = records.ParseBoundaryBox(header[36:68])
-	if err != nil {
-		return fmt.Errorf("%w: unable to parse boundary box", err)
-	}
+	h.fileCode, h.fileLength = fileInfo.FileCode, fileInfo.FileLength
+	h.version, h.shape, h.box = rest.Version, rest.Shape, rest.Box
+	h.zRange, h.mRange = rest.ZBox, rest.MBox
 
 	return nil
 }

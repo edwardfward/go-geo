@@ -33,7 +33,7 @@ func GetShapeType(value ShapeType) (Record, error) {
 		result := EmptyNullShape()
 		shape = &result
 	case POINT:
-		result := EmptyPoint()
+		result := EmptyPointRecord()
 		shape = &result
 	case POLYLINE:
 		result := EmptyPolyLine()

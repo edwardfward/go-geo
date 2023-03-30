@@ -3,12 +3,10 @@ package records
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 )
 
 type Polygon struct {
-	header    RecordHeader
 	shape     ShapeType
 	box       BoundaryBox
 	numParts  int32
@@ -17,66 +15,52 @@ type Polygon struct {
 	points    []Point
 }
 
-func (p *Polygon) Parse(record []byte, header RecordHeader) error {
-	// parse shape type
-	err := binary.Read(bytes.NewReader(record[0:4]), binary.LittleEndian, &p.shape)
-	if err != nil {
-		return fmt.Errorf("%w: failed to parse polygon record shape type", err)
-	}
-	// check shape type
-	if p.shape != POLYGON {
-		var polygonShapeParseError = errors.New("incorrect shape type parsed for polygon")
+func (p *Polygon) Parse(record []byte) error {
+	// get the number of parts and points to set up parsing of
+	// the polygon record
+	initial := struct {
+		Shape     ShapeType
+		Box       BoundaryBox
+		NumParts  int32
+		NumPoints int32
+	}{}
 
-		return fmt.Errorf("%w: parsed %d", polygonShapeParseError, &p.shape)
-	}
-
-	// parse boundary box
-	p.box, err = ParseBoundaryBox(record[4:36])
-	if err != nil {
-		return fmt.Errorf("%w: error parsing polygon boundary box", err)
+	if err := binary.Read(bytes.NewReader(record), binary.LittleEndian, &initial); err != nil {
+		return fmt.Errorf("error parsing polygon shape initial struct: %w", err)
 	}
 
-	// polygon number of parts
-	err = binary.Read(bytes.NewReader(record[36:40]), binary.LittleEndian, &p.numParts)
-	if err != nil || p.numParts < 0 {
-		return fmt.Errorf("%w: error parsing number of parts for polygon", err)
+	partsAndPoints := struct {
+		Parts  []int32
+		Points []Point
+	}{}
+
+	partsAndPoints.Parts = make([]int32, initial.NumParts)
+	partsAndPoints.Points = make([]Point, initial.NumPoints)
+
+	// parse points and parts
+	if err := binary.Read(bytes.NewReader(record[44:]), binary.LittleEndian, &partsAndPoints); err != nil {
+		return fmt.Errorf("error parsing polygon parts and points array: %w", err)
 	}
 
-	// polygon number of points
-	err = binary.Read(bytes.NewReader(record[40:44]), binary.LittleEndian,
-		&p.numPoints)
-	if err != nil || p.numPoints < 0 {
-		return fmt.Errorf("%w: error parsing number of points for polygon %x",
-			err, record[40:44])
-	}
-	// polygon part array
-	p.parts, err = ParseParts(record[44:44+p.numParts*INT32LENGTH], p.numParts)
-	if err != nil {
-		return fmt.Errorf("%w: error parsing polygon parts array", err)
-	}
-
-	// polygon point array
-	p.points, err = ParsePoints(record[44+p.numParts*INT32LENGTH:], p.numPoints)
-	if err != nil {
-		return fmt.Errorf("%w: error parsing polygon points array", err)
-	}
+	// assign
+	p.shape = initial.Shape
+	p.box = initial.Box
+	p.numParts = initial.NumParts
+	p.numPoints = initial.NumPoints
+	p.parts = partsAndPoints.Parts
+	p.points = partsAndPoints.Points
 
 	return nil
 }
 
 // LengthBytes returns the polygon's byte length.
 func (p *Polygon) LengthBytes() int32 {
-	return p.header.contentLength * WORDMULTIPLE
-}
-
-// RecordNumber returns the polygon's record number.
-func (p *Polygon) RecordNumber() int32 {
-	return p.header.recordNumber
+	return 0
 }
 
 // EmptyPolygon returns and empty or default Polygon shape.
 func EmptyPolygon() Polygon {
-	return Polygon{header: EmptyRecordHeader(),
+	return Polygon{
 		shape:     POLYGON,
 		box:       EmptyBoundaryBox(),
 		numParts:  0,
