@@ -11,6 +11,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("%v: failed to parse file", err)
 	}
+
 	log.Printf("Shapefile parsed in %s", shapeFile.ParseDuration())
 	log.Printf("Parsed %d %ss", shapeFile.NumberOfRecords(), shapeFile.ShapeType())
 
@@ -18,6 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("%v: failed to parse file", err)
 	}
+
 	log.Printf("Shapefile parsed in %s", polygonFile.ParseDuration())
 	log.Printf("Parsed %d %ss", polygonFile.NumberOfRecords(), polygonFile.ShapeType())
 }

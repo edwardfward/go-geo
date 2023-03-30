@@ -61,7 +61,6 @@ func EmptyShapeFile() ShapeFile {
 // Parse takes a file binary and parses a shapefile.
 func (s *ShapeFile) Parse(file *os.File) error {
 	// start the clock
-
 	// parse shapefile header
 	headerBytes := make([]byte, header.SHAPEFILEHEADERLENGTH)
 
