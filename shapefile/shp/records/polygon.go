@@ -29,17 +29,23 @@ func (p *Polygon) Parse(record []byte) error {
 		return fmt.Errorf("error parsing polygon shape initial struct: %w", err)
 	}
 
-	partsAndPoints := struct {
-		Parts  []int32
-		Points []Point
-	}{}
+	// look into making this a function, repeated
+	parts := make([]int32, initial.NumParts)
+	points := make([]Point, initial.NumPoints)
 
-	partsAndPoints.Parts = make([]int32, initial.NumParts)
-	partsAndPoints.Points = make([]Point, initial.NumPoints)
+	partsStart := 44
+	partsEnd := partsStart + int(initial.NumParts)*4
 
-	// parse points and parts
-	if err := binary.Read(bytes.NewReader(record[44:]), binary.LittleEndian, &partsAndPoints); err != nil {
-		return fmt.Errorf("error parsing polygon parts and points array: %w", err)
+	// parse parts
+	if err := binary.Read(bytes.NewReader(record[partsStart:partsEnd]),
+		binary.LittleEndian, &parts); err != nil {
+		return fmt.Errorf("error parsing polygon parts array: %w", err)
+	}
+
+	// parse points
+	if err := binary.Read(bytes.NewReader(record[partsEnd:]),
+		binary.LittleEndian, &points); err != nil {
+		return fmt.Errorf("error parsing polygon points array: %w", err)
 	}
 
 	// assign
@@ -47,15 +53,10 @@ func (p *Polygon) Parse(record []byte) error {
 	p.box = initial.Box
 	p.numParts = initial.NumParts
 	p.numPoints = initial.NumPoints
-	p.parts = partsAndPoints.Parts
-	p.points = partsAndPoints.Points
+	p.parts = parts
+	p.points = points
 
 	return nil
-}
-
-// LengthBytes returns the polygon's byte length.
-func (p *Polygon) LengthBytes() int32 {
-	return 0
 }
 
 // EmptyPolygon returns and empty or default Polygon shape.

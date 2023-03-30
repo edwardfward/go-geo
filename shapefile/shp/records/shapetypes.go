@@ -72,3 +72,18 @@ func GetShapeType(value ShapeType) (Record, error) {
 
 	return shape, nil
 }
+
+func (s *ShapeType) String() string {
+	switch *s {
+	case NULLSHAPE:
+		return "Nullshape"
+	case POINT:
+		return "Point"
+	case POLYLINE:
+		return "PolyLine"
+	case POLYGON:
+		return "Polygon"
+	default:
+		return "Nullshape"
+	}
+}

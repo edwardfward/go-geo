@@ -39,7 +39,7 @@ func (p *PointRecord) Parse(record []byte) error {
 func (p *Point) Parse(pointBytes []byte) error {
 	// check the slice is 16-bytes
 	if len(pointBytes) != POINTLENGTH {
-		var byteError error = errors.New("incorrect number of bytes received")
+		var byteError = errors.New("incorrect number of bytes received")
 
 		return fmt.Errorf("error parsing point: %w", byteError)
 	}

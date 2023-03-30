@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"log"
-
 	"go-geo/shapefile/shp/records"
 )
 
@@ -31,8 +29,6 @@ func (h *ShapeFileHeader) Parse(header []byte) error {
 		return fmt.Errorf("error parsing shapefile: shape file headers need to " +
 			"be 100 bytes")
 	}
-
-	log.Printf("File header is %d bytes", len(header))
 
 	// parse header file code and file length
 	fileInfo := struct {

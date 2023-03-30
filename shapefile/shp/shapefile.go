@@ -21,6 +21,9 @@ type ShapeFile struct {
 
 // ParseShapeFile parses a raw ESRI shapefile.
 func ParseShapeFile(filePath string) (*ShapeFile, error) {
+	// start the clock
+	start := time.Now()
+
 	// open shapefile
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -40,6 +43,9 @@ func ParseShapeFile(filePath string) (*ShapeFile, error) {
 		return &shapeFile, fmt.Errorf("%w: [shapefile.go] unable to parse file", err)
 	}
 
+	// stop the clock
+	shapeFile.timeToParse = time.Since(start)
+
 	return &shapeFile, nil
 }
 
@@ -54,6 +60,8 @@ func EmptyShapeFile() ShapeFile {
 
 // Parse takes a file binary and parses a shapefile.
 func (s *ShapeFile) Parse(file *os.File) error {
+	// start the clock
+
 	// parse shapefile header
 	headerBytes := make([]byte, header.SHAPEFILEHEADERLENGTH)
 
@@ -75,4 +83,17 @@ func (s *ShapeFile) Parse(file *os.File) error {
 	}
 
 	return nil
+}
+
+func (s *ShapeFile) ParseDuration() time.Duration {
+	return s.timeToParse
+}
+
+func (s *ShapeFile) NumberOfRecords() int {
+	return len(s.records)
+}
+
+func (s *ShapeFile) ShapeType() string {
+	shapeType := s.header.ShapeType()
+	return shapeType.String()
 }

@@ -25,13 +25,13 @@ func (p *PolyLine) Parse(record []byte) error {
 		NumPoints int32       // 4-bytes
 	}{}
 
-	// parse shape, box, numparts, and numpoints
+	// parse shape, box, numParts, and numPoints
 	if err := binary.Read(bytes.NewReader(record[:44]),
 		binary.LittleEndian, &initial); err != nil {
 		return fmt.Errorf("error parsing record information: %w", err)
 	}
 
-	// check numparts and numpoints positive
+	// check numParts and numPoints positive
 	if initial.NumParts < 0 || initial.NumPoints < 0 {
 		return fmt.Errorf("error parsing number of points or parts: cannot have negative " +
 			"number of points or parts")

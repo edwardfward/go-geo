@@ -31,11 +31,6 @@ func (n *NullShape) Parse(record []byte) error {
 	return nil
 }
 
-// LengthBytes returns the null shape record's length in bytes.
-func (n *NullShape) LengthBytes() int32 {
-	return NULLSHAPELENGTH // content length is number of 16-bit (2 byte) words
-}
-
 // EmptyNullShape returns an empty or default null shape.
 func EmptyNullShape() NullShape {
 	return NullShape{Shape: NULLSHAPE}
